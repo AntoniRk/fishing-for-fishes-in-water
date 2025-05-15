@@ -17,6 +17,7 @@
             position: relative;
             font-family: sans-serif;
             color: white;
+            cursor: none;
         }
 
         .modal-central {
@@ -75,10 +76,25 @@
             }
         }
 
-
         .modal-extra {
             animation: floatRotateFade 8s linear forwards;
             will-change: transform, opacity;
+        }
+
+        .hook {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -86,24 +102,113 @@
 <body>
     <div class="modal-central" id="annoyModal">
         <h2>fishing for fishes</h2>
-        <p>fishing for fishes in water</p>
+        <p>fishing for fishes in water with no bait</p>
+    </div>
+
+    <canvas id="fishingLine"></canvas>
+    <div class="hook" id="hook">
+        <svg viewBox="0 0 24 24">
+            <path
+                d="M16,2C13.24,2 11,4.24 11,7V13H7V7C7,4.24 4.76,2 2,2V5C3.66,5 5,6.34 5,8V13C5,15.21 6.79,17 9,17H11V13L12,10L13,13V17H15C17.21,17 19,15.21 19,13V8C19,6.34 20.34,5 22,5V2C19.24,2 17,4.24 17,7V13H13V7C13,4.24 15.24,2 18,2"
+                fill="gray" transform="rotate(180 12 12)" />
+        </svg>
     </div>
 
     <script>
+        const canvas = document.getElementById('fishingLine');
+        const ctx = canvas.getContext('2d');
+        const hook = document.getElementById('hook');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const lineStart = {
+            x: window.innerWidth / 2,
+            y: 0
+        };
+
+        let currentHookPosition = {
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 3
+        };
+
+        let targetPosition = {
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 3
+        };
+
+        let previousPosition = { ...currentHookPosition };
+
+        let direction = {
+            x: 0,
+            y: 0
+        };
+
+        document.addEventListener('mousemove', (e) => {
+            targetPosition.x = e.clientX;
+            targetPosition.y = e.clientY;
+        });
+
+        function drawFishingLine() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            direction.x = currentHookPosition.x - previousPosition.x;
+            direction.y = currentHookPosition.y - previousPosition.y;
+
+            previousPosition = { ...currentHookPosition };
+
+            ctx.beginPath();
+            ctx.moveTo(lineStart.x, lineStart.y);
+
+            const bendFactor = 2.3; // How much the line bends
+            const controlPoint = {
+                x: (lineStart.x + currentHookPosition.x) / 2 - direction.x * bendFactor,
+                y: (lineStart.y + currentHookPosition.y) / 2 - direction.y * bendFactor
+            };
+
+            ctx.quadraticCurveTo(
+                controlPoint.x,
+                controlPoint.y,
+                currentHookPosition.x,
+                currentHookPosition.y
+            );
+
+            ctx.strokeStyle = 'brown';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function animate() {
+            const easing = 0.02; // Lower = slower follow
+
+            currentHookPosition.x += (targetPosition.x - currentHookPosition.x) * easing;
+            currentHookPosition.y += (targetPosition.y - currentHookPosition.y) * easing;
+
+            hook.style.left = (currentHookPosition.x - hook.offsetWidth / 2) + 'px';
+            hook.style.top = (currentHookPosition.y - hook.offsetHeight / 2) + 'px';
+
+            drawFishingLine();
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
         function createExtraModal() {
             const modal = document.createElement('div');
             modal.className = 'modal-extra';
             modal.innerHTML = '<p>O</p>';
-
             const x = Math.random() * (window.innerWidth - 100);
             const y = Math.random() * (window.innerHeight - 200);
             modal.style.left = x + 'px';
             modal.style.top = y + 'px';
-
             document.body.appendChild(modal);
-
             setTimeout(() => modal.classList.add('visible'), 50);
-
             modal.addEventListener('animationend', () => {
                 if (modal.parentElement) {
                     modal.remove();
@@ -116,7 +221,6 @@
             setTimeout(() => {
                 central.classList.add('visible');
             }, 1000);
-
             setInterval(() => {
                 const count = Math.floor(Math.random() * 8) + 1;
                 for (let i = 0; i < count; i++) {
