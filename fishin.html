@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>łowienie ryb</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #0095ff;
+            background: linear-gradient(180deg, rgba(0, 149, 255, 1) 0%, rgba(0, 15, 125, 1) 100%);
+            overflow: hidden;
+            position: relative;
+            font-family: sans-serif;
+            color: white;
+        }
+
+        /* Centralny modal */
+        .modal-central {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: transparent;
+            padding: 1.5rem;
+            border: none;
+            /* bez border-radius, bez box-shadow */
+            opacity: 0;
+            transition: opacity 5s ease-in;
+            pointer-events: none;
+            z-index: 100;
+            text-align: center;
+        }
+
+        .modal-central.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Dodatkowe modale */
+        .modal-extra {
+            position: fixed;
+            background: transparent;
+            padding: 1rem;
+            border: none;
+            /* bez border-radius, bez box-shadow */
+            opacity: 0;
+            transition: all 1s ease-in;
+            pointer-events: none;
+            font-size: 0.9rem;
+        }
+
+        .modal-extra.visible {
+            opacity: 1;
+        }
+
+        .modal-extra.disappearing {
+            opacity: 0;
+            transition: opacity 1s ease-out;
+        }
+
+        @keyframes floatRotateFade {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-80px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+
+        .modal-extra {
+            animation: floatRotateFade 8s linear forwards;
+            will-change: transform, opacity;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="modal-central" id="annoyModal">
+        <h2>łowienie ryb</h2>
+        <p>łowienie ryb w wodzie</p>
+    </div>
+
+    <script>
+        function createExtraModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-extra';
+            modal.innerHTML = '<p>O</p>';
+
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 200);
+            modal.style.left = x + 'px';
+            modal.style.top = y + 'px';
+
+            document.body.appendChild(modal);
+
+            // Dodaj klasę visible, żeby włączyć opacity 1 i uruchomić animację
+            setTimeout(() => modal.classList.add('visible'), 50);
+
+            // Po 5s (czas animacji) usuń element
+            modal.addEventListener('animationend', () => {
+                if (modal.parentElement) {
+                    modal.remove();
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Pokaż centralny modal stopniowo
+            const central = document.getElementById('annoyModal');
+            setTimeout(() => {
+                central.classList.add('visible');
+            }, 1000);
+
+            // Twórz dodatkowe modale co losowy czas
+            setInterval(() => {
+                const count = Math.floor(Math.random() * 8) + 1;
+                for (let i = 0; i < count; i++) {
+                    createExtraModal();
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+
+</html>
