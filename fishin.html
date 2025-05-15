@@ -19,7 +19,6 @@
             color: white;
         }
 
-        /* Centralny modal */
         .modal-central {
             position: fixed;
             top: 50%;
@@ -28,7 +27,6 @@
             background: transparent;
             padding: 1.5rem;
             border: none;
-            /* bez border-radius, bez box-shadow */
             opacity: 0;
             transition: opacity 5s ease-in;
             pointer-events: none;
@@ -41,13 +39,11 @@
             pointer-events: auto;
         }
 
-        /* Dodatkowe modale */
         .modal-extra {
             position: fixed;
             background: transparent;
             padding: 1rem;
             border: none;
-            /* bez border-radius, bez box-shadow */
             opacity: 0;
             transition: all 1s ease-in;
             pointer-events: none;
@@ -89,8 +85,8 @@
 
 <body>
     <div class="modal-central" id="annoyModal">
-        <h2>łowienie ryb</h2>
-        <p>łowienie ryb w wodzie</p>
+        <h2>fishing for fishes</h2>
+        <p>fishing for fishes in water</p>
     </div>
 
     <script>
@@ -106,10 +102,8 @@
 
             document.body.appendChild(modal);
 
-            // Dodaj klasę visible, żeby włączyć opacity 1 i uruchomić animację
             setTimeout(() => modal.classList.add('visible'), 50);
 
-            // Po 5s (czas animacji) usuń element
             modal.addEventListener('animationend', () => {
                 if (modal.parentElement) {
                     modal.remove();
@@ -118,13 +112,11 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Pokaż centralny modal stopniowo
             const central = document.getElementById('annoyModal');
             setTimeout(() => {
                 central.classList.add('visible');
             }, 1000);
 
-            // Twórz dodatkowe modale co losowy czas
             setInterval(() => {
                 const count = Math.floor(Math.random() * 8) + 1;
                 for (let i = 0; i < count; i++) {
